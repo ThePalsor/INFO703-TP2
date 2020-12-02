@@ -1,0 +1,5 @@
+package fr.usmb.m1isc.compilation.tp;
+
+public enum NodeType {
+	SEMI,ENTIER,BOOL,LET,IDENT,PLUS,MOINS,MOINS_UN,MUL,DIV,MOD,LT,GT,LTE,GTE,NOT,AND,OR,EGAL,WHILE,IF,OUTPUT,INPUT
+}
