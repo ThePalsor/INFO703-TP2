@@ -62,7 +62,9 @@ precedence left MOINS_UNAIRE;
 // un pg est une sequence d'insctions terminee par point
 program ::= 
 	sequence:s POINT  {: tree = s;
-						System.out.println(s);:}
+						System.out.println(s);
+						CodeGenerator cg = new CodeGenerator(tree, "code.asm", vars);
+						cg.generate();:}
 	;
 
 // une sequence est une suite d'instructions separes par des point virgules	
@@ -74,7 +76,7 @@ sequence ::= expression:e1 SEMI sequence:e2 {: RESULT = new Tree(NodeType.SEMI, 
 // une expession est soit une affectation ,une 			 
 expression ::= expr:e {: RESULT = e; :}
              | LET IDENT:nom EGAL expr:e  	{: RESULT = new Tree(NodeType.LET, null, new Tree(NodeType.IDENT, nom, null, null), e);
-												vars.put(nom, (Integer) e.getValue()); :}			
+												vars.put(nom, 0); :}			
              | WHILE expr:cond DO expression:e {: RESULT = new Tree(NodeType.WHILE, null, cond, e); :}
              | IF expr:cond THEN expression:a1 ELSE expression:a2 {: System.out.println("if");
 																	RESULT = new Tree(NodeType.IF, null, cond, a1, a2); :}
@@ -82,28 +84,28 @@ expression ::= expr:e {: RESULT = e; :}
 			 ;
 
 // 
-expr ::= NOT:op expr:e {: RESULT = new Tree(NodeType.NOT, !((Boolean) e.getValue()).booleanValue(), e); :}
-	   | expr:e1 AND expr:e2 {: RESULT = new Tree(NodeType.AND, ((Boolean) e1.getValue()).booleanValue() && ((Boolean) e2.getValue()).booleanValue(), e1, e2); :}
-	   | expr:e1 OR expr:e2 {: RESULT = new Tree(NodeType.OR, ((Boolean) e1.getValue()).booleanValue() || ((Boolean) e2.getValue()).booleanValue(), e1, e2); :}
-	   | expr:e1 EGAL expr:e2 {: RESULT = new Tree(NodeType.EGAL, ((Integer) e1.getValue()).intValue() == ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 GT expr:e2 {: RESULT = new Tree(NodeType.GT, ((Integer) e1.getValue()).intValue() > ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 GTE expr:e2 {: RESULT = new Tree(NodeType.GTE, ((Integer) e1.getValue()).intValue() >= ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 LT expr:e2 {: RESULT = new Tree(NodeType.LT, ((Integer) e1.getValue()).intValue() < ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 LTE expr:e2 {: RESULT = new Tree(NodeType.LTE, ((Integer) e1.getValue()).intValue() <= ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 PLUS expr:e2 {: RESULT = new Tree(NodeType.PLUS, ((Integer) e1.getValue()).intValue() + ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 MOINS expr:e2 {: RESULT = new Tree(NodeType.MOINS, ((Integer) e1.getValue()).intValue() - ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 MUL expr:e2 {: RESULT = new Tree(NodeType.MUL, ((Integer) e1.getValue()).intValue() * ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 DIV expr:e2 {: RESULT = new Tree(NodeType.DIV, ((Integer) e1.getValue()).intValue() / ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | expr:e1 MOD expr:e2 {: RESULT = new Tree(NodeType.MOD, ((Integer) e1.getValue()).intValue() % ((Integer) e2.getValue()).intValue(), e1, e2); :}
-	   | MOINS expr:e  %prec MOINS_UNAIRE {: RESULT = new Tree(NodeType.MOINS_UN, -((Integer) e1.getValue()).intValue(), null, null); :}
+expr ::= NOT:op expr:e {: RESULT = new Tree(NodeType.NOT, null, e); :}
+	   | expr:e1 AND expr:e2 {: RESULT = new Tree(NodeType.AND, null, e1, e2); :}
+	   | expr:e1 OR expr:e2 {: RESULT = new Tree(NodeType.OR, null, e1, e2); :}
+	   | expr:e1 EGAL expr:e2 {: RESULT = new Tree(NodeType.EGAL, null, e1, e2); :}
+	   | expr:e1 GT expr:e2 {: RESULT = new Tree(NodeType.GT, null, e1, e2); :}
+	   | expr:e1 GTE expr:e2 {: RESULT = new Tree(NodeType.GTE, null, e1, e2); :}
+	   | expr:e1 LT expr:e2 {: RESULT = new Tree(NodeType.LT, null, e1, e2); :}
+	   | expr:e1 LTE expr:e2 {: RESULT = new Tree(NodeType.LTE, null, e1, e2); :}
+	   | expr:e1 PLUS expr:e2 {: RESULT = new Tree(NodeType.PLUS, null, e1, e2); :}
+	   | expr:e1 MOINS expr:e2 {: RESULT = new Tree(NodeType.MOINS, null, e1, e2); :}
+	   | expr:e1 MUL expr:e2 {: RESULT = new Tree(NodeType.MUL, null, e1, e2); :}
+	   | expr:e1 DIV expr:e2 {: RESULT = new Tree(NodeType.DIV, null, e1, e2); :}
+	   | expr:e1 MOD expr:e2 {: RESULT = new Tree(NodeType.MOD, null, e1, e2); :}
+	   | MOINS expr:e  %prec MOINS_UNAIRE //{: RESULT = new Tree(NodeType.MOINS_UN, -((Integer) e1.getValue()).intValue(), null, null); :}
 	   | OUTPUT expr:e {: RESULT = new Tree(NodeType.OUTPUT, null, e); :}
 	   | INPUT {: RESULT = new Tree(NodeType.INPUT, 0); :}
 	   | NIL
 	   | BOOL:b {: RESULT = new Tree(NodeType.BOOL, b, null, null); :}
 	   | ENTIER:n {: RESULT = new Tree(NodeType.ENTIER, n, null, null); :}
-	   | IDENT:id {: Integer value = ( Integer ) vars.get( id );
+	   | IDENT:id {: 
 
-						RESULT = new Tree(NodeType.IDENT, value, null, null); :}
+						RESULT = new Tree(NodeType.IDENT, id, null, null); :}
 	   | PAR_G sequence:e PAR_D {: RESULT = e; :}
 	   ;
 

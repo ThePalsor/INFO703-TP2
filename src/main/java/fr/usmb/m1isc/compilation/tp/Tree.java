@@ -58,6 +58,10 @@ public class Tree {
 	public Object getValue() {
 		return value;
 	}
+	
+	public ArrayList<Tree> getSubtrees() {
+		return subtrees;
+	}
 
 	public void setValue(Object value) {
 		this.value = value;
